@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Matematyczny</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* =====================================================
+       STRONA GŁÓWNA – style i layout
+       Żeby zmienić kolory, edytuj zmienne w :root
+       ===================================================== */
+
+    :root {
+      --bg:         #0d1b2a;
+      --card-bg:    #132337;
+      --accent-1:   #f7c948;   /* żółty – mnożenie */
+      --accent-2:   #e05c5c;   /* czerwony – potęgowanie */
+      /* Tutaj możesz dodać kolejne akcenty dla nowych zakładek */
+      --text:       #e8f0f7;
+      --text-muted: #7a9ab5;
+      --radius:     18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow: hidden;
+    }
+
+    /* Tło – geometryczne kółka */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(247,201,72,0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(224,92,92,0.08) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+      animation: fadeDown 0.7s ease both;
+    }
+
+    header .emoji {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+      animation: bounce 2s infinite ease-in-out;
+    }
+
+    header h1 {
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    header h1 span {
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      margin-top: 0.75rem;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    /* Siatka kart – łatwo dodać nową kartę */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 780px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 2.2rem 2rem;
+      text-decoration: none;
+      color: var(--text);
+      border: 2px solid transparent;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      animation: fadeUp 0.6s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.15s; --accent: var(--accent-1); }
+    .card:nth-child(2) { animation-delay: 0.3s;  --accent: var(--accent-2); }
+    /* Nowe karty: dodaj nth-child(3) z własnym --accent */
+
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    .card:hover::after { transform: scaleX(1); }
+
+    .card-icon {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .card h2 {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .card .arrow {
+      display: inline-block;
+      margin-top: 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+
+    footer {
+      margin-top: 3rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      animation: fadeUp 0.8s 0.5s ease both;
+    }
+
+    /* Animacje */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="emoji">🧮</span>
+    <h1>Quiz <span>Matematyczny</span></h1>
+    <p>Wybierz temat i sprawdź swoją wiedzę!</p>
+  </header>
+
+  <!-- ================================================
+       KARTY NAWIGACYJNE
+       Żeby dodać nowy quiz, skopiuj blok <a class="card">
+       i wskaż właściwy plik HTML w href=""
+       ================================================ -->
+  <div class="cards">
+
+    <a class="card" href="mnozenie.html">
+      <span class="card-icon">✖️</span>
+      <h2>Tabliczka mnożenia</h2>
+      <p>Ćwicz mnożenie liczb od 1 do 10. Wybierz poprawny wynik spośród czterech odpowiedzi.</p>
+      <span class="arrow">Zaczynamy →</span>
+    </a>
+
+    <a class="card" href="potegowanie.html">
+      <span class="card-icon">⚡</span>
+      <h2>Potęgowanie</h2>
+      <p>Obliczaj potęgi liczb od 1 do 20. Wynik nigdy nie przekroczy 1024.</p>
+      <span class="arrow">Zaczynamy →</span>
+    </a>
+
+    <!-- Tutaj wklejaj kolejne karty, np.:
+    <a class="card" href="pierwiastki.html">
+      <span class="card-icon">√</span>
+      <h2>Pierwiastki</h2>
+      <p>Opis nowego quizu.</p>
+      <span class="arrow">Zaczynamy →</span>
+    </a>
+    -->
+
+  </div>
+
+  <footer>Powodzenia! 🎯</footer>
+
+</body>
+</html>
