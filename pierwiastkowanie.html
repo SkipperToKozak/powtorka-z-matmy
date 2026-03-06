@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pierwiastkowanie – Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* =====================================================
+       QUIZ – PIERWIASTKOWANIE
+       Kolory i ustawienia: edytuj zmienne w :root
+       ===================================================== */
+    :root {
+      --bg:          #0d1b2a;
+      --surface:     #132337;
+      --surface-2:   #1a2e45;
+      --accent:      #4fc4a0;      /* turkusowy – pierwiastkowanie */
+      --accent-dim:  rgba(79,196,160,0.12);
+      --correct:     #4caf78;
+      --wrong:       #e05c5c;
+      --text:        #e8f0f7;
+      --text-muted:  #7a9ab5;
+      --radius:      14px;
+      --radius-lg:   22px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(79,196,160,0.07) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    /* ---- NAWIGACJA ---- */
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--accent); }
+    nav .sep { color: var(--text-muted); }
+    nav .current { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+
+    /* ---- LAYOUT ---- */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 1.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    @media (max-width: 720px) {
+      .layout { grid-template-columns: 1fr; }
+      .stats-panel { order: -1; }
+    }
+
+    /* ---- PANEL PYTANIA ---- */
+    .quiz-panel {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .question-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
+
+    /* ---- Kontener pytania z MathML ---- */
+    .question {
+      text-align: center;
+      padding: 1.5rem 0 2rem;
+      /* Skalowanie MathML do odpowiedniego rozmiaru */
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+    }
+
+    /* Stylowanie elementów MathML przez CSS */
+    .question math {
+      display: inline-block;
+      color: var(--text);
+    }
+
+    /* Kolor indeksu (stopnia) pierwiastka */
+    .question mroot > *:last-child {
+      color: var(--accent);
+      font-size: 0.7em;
+    }
+
+    /* Wyrównanie i odstępy operatorów */
+    .question mo {
+      padding: 0 0.25em;
+      color: var(--text-muted);
+    }
+
+    /* ---- OPCJE ---- */
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+
+    .option-btn {
+      background: var(--surface-2);
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      color: var(--text);
+      cursor: pointer;
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.5rem;
+      font-weight: 800;
+      padding: 1rem;
+      transition: background 0.18s, border-color 0.18s, transform 0.15s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      transform: scale(1.03);
+    }
+
+    .option-btn.correct {
+      background: rgba(76,175,120,0.15);
+      border-color: var(--correct);
+      color: var(--correct);
+    }
+
+    .option-btn.wrong {
+      background: rgba(224,92,92,0.15);
+      border-color: var(--wrong);
+      color: var(--wrong);
+    }
+
+    .option-btn:disabled { cursor: default; }
+
+    /* ---- FEEDBACK ---- */
+    .feedback {
+      text-align: center;
+      min-height: 2.5rem;
+      margin-top: 1.5rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feedback.show { opacity: 1; }
+    .feedback.ok   { color: var(--correct); }
+    .feedback.err  { color: var(--wrong); }
+
+    /* ---- PANEL STATYSTYK ---- */
+    .stats-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      animation: fadeIn 0.5s 0.15s ease both;
+    }
+
+    /* Karta ustawień */
+    .settings-card,
+    .stats-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 1.6rem;
+    }
+
+    .card-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* ---- USTAWIENIA ---- */
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .setting-row:last-child { margin-bottom: 0; }
+
+    .setting-label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .setting-label strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+
+    /* kontrolka licznika +/- */
+    .counter {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .counter-btn {
+      background: var(--surface-2);
+      border: 2px solid var(--surface-2);
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 800;
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .counter-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .counter-val {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.3rem;
+      font-weight: 800;
+      min-width: 2rem;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    .apply-btn {
+      display: block;
+      width: 100%;
+      margin-top: 1.2rem;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      color: var(--accent);
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 800;
+      padding: 0.6rem;
+      transition: background 0.2s;
+    }
+    .apply-btn:hover { background: rgba(79,196,160,0.22); }
+
+    /* ---- STATYSTYKI ---- */
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--surface-2);
+      font-size: 0.92rem;
+    }
+    .stat-row:last-of-type { border-bottom: none; }
+    .stat-label { color: var(--text-muted); }
+    .stat-value {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+    .stat-value.green { color: var(--correct); }
+    .stat-value.red   { color: var(--wrong); }
+    .stat-value.accent{ color: var(--accent); }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--surface-2);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 1.2rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #a0ffe8);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+
+    .reset-btn {
+      display: block;
+      width: 100%;
+      margin-top: 1.2rem;
+      background: none;
+      border: 2px solid var(--surface-2);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.6rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .reset-btn:hover { border-color: var(--wrong); color: var(--wrong); }
+
+    /* ---- ANIMACJE ---- */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .pop { animation: pop 0.25s ease; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html">🏠 Strona główna</a>
+    <span class="sep">/</span>
+    <span class="current">√ Pierwiastkowanie</span>
+  </nav>
+
+  <div class="layout">
+
+    <!-- PANEL PYTANIA -->
+    <div class="quiz-panel">
+      <div class="question-label">📌 Pytanie</div>
+
+      <!-- Pierwiastek renderowany przez MathML – aktualizowany przez JS -->
+      <div class="question" id="question">
+        <!-- Zawartość wstrzykiwana dynamicznie przez funkcję renderMathML() -->
+      </div>
+
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <!-- PRAWY PANEL -->
+    <div class="stats-panel">
+
+      <!-- USTAWIENIA -->
+      <div class="settings-card">
+        <div class="card-title">⚙️ Ustawienia</div>
+
+        <div class="setting-row">
+          <div class="setting-label">
+            <strong>Maks. stopień pierwiastka</strong>
+            np. 2 = √, 3 = ∛
+          </div>
+          <div class="counter">
+            <button class="counter-btn" id="deg-minus">−</button>
+            <span class="counter-val" id="deg-val">3</span>
+            <button class="counter-btn" id="deg-plus">+</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-label">
+            <strong>Maks. wynik pierwiastka</strong>
+            np. 20 → ³√8000 = 20
+          </div>
+          <div class="counter">
+            <button class="counter-btn" id="res-minus">−</button>
+            <span class="counter-val" id="res-val">20</span>
+            <button class="counter-btn" id="res-plus">+</button>
+          </div>
+        </div>
+
+        <button class="apply-btn" id="apply-btn">✅ Zastosuj i nowe pytanie</button>
+      </div>
+
+      <!-- STATYSTYKI -->
+      <div class="stats-card">
+        <div class="card-title">📊 Statystyki</div>
+
+        <div class="stat-row">
+          <span class="stat-label">Pytania</span>
+          <span class="stat-value accent" id="stat-total">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Poprawne</span>
+          <span class="stat-value green" id="stat-correct">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Błędne</span>
+          <span class="stat-value red" id="stat-wrong">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Seria</span>
+          <span class="stat-value accent" id="stat-streak">0 🔥</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Najlepsza seria</span>
+          <span class="stat-value" id="stat-best-streak">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Dokładność</span>
+          <span class="stat-value" id="stat-accuracy">–</span>
+        </div>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-label">
+          <span>Dokładność</span>
+          <span id="progress-pct">0%</span>
+        </div>
+
+        <button class="reset-btn" id="reset-btn">🔄 Resetuj statystyki</button>
+      </div>
+
+    </div><!-- /.stats-panel -->
+  </div><!-- /.layout -->
+
+  <script>
+    /* ==========================================================
+       KONFIGURACJA DOMYŚLNA
+       Zmień wartości tutaj LUB przez przyciski +/- w panelu
+       ========================================================== */
+    const DEFAULTS = {
+      maxDegree:    3,   // domyślny maksymalny stopień pierwiastka (min. 2)
+      maxResult:   20,   // domyślny maksymalny wynik pierwiastkowania (min. 2)
+      optionCount:  4,   // liczba opcji odpowiedzi
+      nextDelay:  900,   // ms przed przejściem do kolejnego pytania
+    };
+
+    /* Granice suwaków w panelu ustawień */
+    const LIMITS = {
+      minDegree: 2, maxDegree: 10,
+      minResult: 2, maxResult: 100,
+    };
+
+    /* ==========================================================
+       STAN GRY
+       ========================================================== */
+    let cfg = { maxDegree: DEFAULTS.maxDegree, maxResult: DEFAULTS.maxResult };
+
+    let state = {
+      total: 0, correct: 0, wrong: 0,
+      streak: 0, bestStreak: 0,
+      currentAnswer: null, locked: false,
+    };
+
+    /* ==========================================================
+       BUDOWANIE TABLICY PYTAŃ
+       Zbieramy wszystkie pary (radicand, degree) takie że:
+         - degree ∈ [2, cfg.maxDegree]
+         - wynik pierwiastka (całkowity!) ∈ [2, cfg.maxResult]
+         - radicand = wynik^degree
+       Wynik = 1 jest pominięty bo jest trywialny (każdy pierwiastek z 1 = 1)
+       ========================================================== */
+    function buildTable(maxDegree, maxResult) {
+      const table = [];
+      for (let degree = 2; degree <= maxDegree; degree++) {
+        for (let result = 2; result <= maxResult; result++) {
+          const radicand = Math.pow(result, degree);
+          table.push({ degree, radicand, result });
+        }
+      }
+      return table;
+    }
+
+    /* ==========================================================
+       RENDEROWANIE PYTANIA JAKO MATHML
+       Uwaga: innerHTML nie parsuje MathML poprawnie — używamy DOMParser,
+       który zwraca prawdziwy węzeł MathML ze właściwą przestrzenią nazw.
+       Dla degree=2 używamy <msqrt> (bez indeksu — standard matematyczny),
+       dla degree>=3 używamy <mroot> z widocznym indeksem stopnia.
+       ========================================================== */
+    function renderMathML(degree, radicand) {
+      const rootNode  = degree === 2
+        ? `<msqrt><mn>${radicand}</mn></msqrt>`
+        : `<mroot><mn>${radicand}</mn><mn>${degree}</mn></mroot>`;
+
+      const mathStr = `
+        <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+          <mstyle displaystyle="true" mathcolor="#e8f0f7" mathsize="3rem">
+            <mrow>
+              ${rootNode}
+              <mo mathcolor="#7a9ab5" lspace="0.3em" rspace="0.3em">=</mo>
+              <mo mathcolor="#7a9ab5">?</mo>
+            </mrow>
+          </mstyle>
+        </math>`;
+
+      const doc  = new DOMParser().parseFromString(mathStr, 'application/xml');
+      const math = doc.documentElement;
+
+      /* Koloruj indeks stopnia pierwiastka na akcent */
+      if (degree !== 2) {
+        const indexEl = math.querySelector('mroot > mn:last-child');
+        if (indexEl) indexEl.setAttribute('mathcolor', '#4fc4a0');
+      }
+
+      return document.adoptNode(math);
+    }
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = randInt(0, i);
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    /* Generuje opcje: wyniki innych pierwiastków "blisko" poprawnego */
+    function generateOptions(table, correctResult) {
+      /* Zbieramy unikalne wyniki z tablicy jako pulę fałszywych odpowiedzi */
+      const pool = [...new Set(table.map(e => e.result))]
+        .filter(r => r !== correctResult);
+
+      /* Sortuj po odległości od poprawnego wyniku */
+      pool.sort((a, b) => Math.abs(a - correctResult) - Math.abs(b - correctResult));
+
+      const picked = new Set([correctResult]);
+
+      /* Weź najbliższe */
+      for (const v of pool) {
+        if (picked.size >= DEFAULTS.optionCount) break;
+        picked.add(v);
+      }
+
+      /* Jeśli puli brakuje (mało pytań), dopełnij losowymi liczbami */
+      let fallback = correctResult + 1;
+      while (picked.size < DEFAULTS.optionCount) {
+        if (fallback !== correctResult) picked.add(fallback);
+        fallback++;
+      }
+
+      return shuffle([...picked]);
+    }
+
+    /* ==========================================================
+       NOWE PYTANIE
+       ========================================================== */
+    function newQuestion() {
+      state.locked = false;
+      const table = buildTable(cfg.maxDegree, cfg.maxResult);
+
+      if (table.length === 0) {
+        document.getElementById('question').innerHTML =
+          '<p style="color:var(--text-muted);text-align:center">Brak pytań dla tych ustawień.</p>';
+        document.getElementById('options').innerHTML = '';
+        return;
+      }
+
+      const item = table[randInt(0, table.length - 1)];
+      state.currentAnswer = item.result;
+
+      /* Wstrzyknij MathML do kontenera pytania */
+      const qEl = document.getElementById('question');
+      qEl.innerHTML = '';
+      qEl.appendChild(renderMathML(item.degree, item.radicand));
+
+      /* Animacja na kontenerze */
+      qEl.classList.remove('pop');
+      void qEl.offsetWidth;
+      qEl.classList.add('pop');
+
+      /* Opcje */
+      const opts = generateOptions(table, item.result);
+      const container = document.getElementById('options');
+      container.innerHTML = '';
+
+      opts.forEach(val => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = val;
+        btn.addEventListener('click', () => handleAnswer(btn, val));
+        container.appendChild(btn);
+      });
+
+      /* Czyść feedback */
+      const fb = document.getElementById('feedback');
+      fb.className = 'feedback';
+      fb.textContent = '';
+    }
+
+    /* ==========================================================
+       OBSŁUGA ODPOWIEDZI
+       ========================================================== */
+    function handleAnswer(btn, selected) {
+      if (state.locked) return;
+      state.locked = true;
+
+      const isCorrect = selected === state.currentAnswer;
+      state.total++;
+
+      if (isCorrect) {
+        state.correct++;
+        state.streak++;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+        btn.classList.add('correct');
+        showFeedback('ok', '✅ Brawo! Poprawna odpowiedź!');
+      } else {
+        state.wrong++;
+        state.streak = 0;
+        btn.classList.add('wrong');
+        showFeedback('err', `❌ Błąd! Poprawna odpowiedź: ${state.currentAnswer}`);
+        document.querySelectorAll('.option-btn').forEach(b => {
+          if (parseInt(b.textContent) === state.currentAnswer) b.classList.add('correct');
+        });
+      }
+
+      document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+      updateStats();
+      setTimeout(newQuestion, DEFAULTS.nextDelay);
+    }
+
+    /* ==========================================================
+       FEEDBACK
+       ========================================================== */
+    function showFeedback(type, msg) {
+      const fb = document.getElementById('feedback');
+      fb.className = `feedback show ${type}`;
+      fb.textContent = msg;
+    }
+
+    /* ==========================================================
+       AKTUALIZACJA STATYSTYK
+       ========================================================== */
+    function updateStats() {
+      document.getElementById('stat-total').textContent   = state.total;
+      document.getElementById('stat-correct').textContent = state.correct;
+      document.getElementById('stat-wrong').textContent   = state.wrong;
+      document.getElementById('stat-streak').textContent  = `${state.streak} 🔥`;
+      document.getElementById('stat-best-streak').textContent = state.bestStreak;
+
+      const accuracy = state.total > 0
+        ? Math.round((state.correct / state.total) * 100) : 0;
+
+      const accEl = document.getElementById('stat-accuracy');
+      accEl.textContent = state.total > 0 ? `${accuracy}%` : '–';
+      accEl.style.color = accuracy >= 80
+        ? 'var(--correct)' : accuracy >= 50 ? 'var(--accent)' : 'var(--wrong)';
+
+      document.getElementById('progress-fill').style.width = `${accuracy}%`;
+      document.getElementById('progress-pct').textContent  = `${accuracy}%`;
+    }
+
+    /* ==========================================================
+       PANEL USTAWIEŃ – liczniki +/-
+       ========================================================== */
+    function makeCounter(minusId, plusId, valId, cfgKey, limMin, limMax, onApply) {
+      const valEl = document.getElementById(valId);
+
+      document.getElementById(minusId).addEventListener('click', () => {
+        const cur = parseInt(valEl.textContent);
+        if (cur > limMin) valEl.textContent = cur - 1;
+      });
+
+      document.getElementById(plusId).addEventListener('click', () => {
+        const cur = parseInt(valEl.textContent);
+        if (cur < limMax) valEl.textContent = cur + 1;
+      });
+    }
+
+    makeCounter('deg-minus','deg-plus','deg-val','maxDegree',
+      LIMITS.minDegree, LIMITS.maxDegree);
+
+    makeCounter('res-minus','res-plus','res-val','maxResult',
+      LIMITS.minResult, LIMITS.maxResult);
+
+    /* Przycisk "Zastosuj" */
+    document.getElementById('apply-btn').addEventListener('click', () => {
+      cfg.maxDegree = parseInt(document.getElementById('deg-val').textContent);
+      cfg.maxResult = parseInt(document.getElementById('res-val').textContent);
+      newQuestion();
+    });
+
+    /* ==========================================================
+       RESET STATYSTYK
+       ========================================================== */
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      state = { total:0, correct:0, wrong:0, streak:0, bestStreak:0,
+                currentAnswer:null, locked:false };
+      updateStats();
+      newQuestion();
+    });
+
+    /* ==========================================================
+       START
+       ========================================================== */
+    newQuestion();
+  </script>
+
+</body>
+</html>

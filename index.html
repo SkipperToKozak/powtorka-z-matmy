@@ -19,6 +19,8 @@
         --card-bg: #132337;
         --accent-1: #f7c948; /* żółty – mnożenie */
         --accent-2: #e05c5c; /* czerwony – potęgowanie */
+        --accent-3: #4fc4a0; /* turkusowy – pierwiastkowanie */
+        --accent-4: #a78bfa; /* fioletowy – dzielenie */
         /* Tutaj możesz dodać kolejne akcenty dla nowych zakładek */
         --text: #e8f0f7;
         --text-muted: #7a9ab5;
@@ -53,15 +55,21 @@
         inset: 0;
         background:
           radial-gradient(
-            circle at 15% 20%,
-            rgba(247, 201, 72, 0.08) 0%,
-            transparent 40%
-          ),
-          radial-gradient(
             circle at 85% 75%,
             rgba(224, 92, 92, 0.08) 0%,
             transparent 40%
+          ),
+          radial-gradient(
+            circle at 50% 90%,
+            rgba(79, 196, 160, 0.06) 0%,
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(167, 139, 250, 0.06) 0%,
+            transparent 40%
           );
+
         pointer-events: none;
       }
 
@@ -131,6 +139,14 @@
       .card:nth-child(2) {
         animation-delay: 0.3s;
         --accent: var(--accent-2);
+      }
+      .card:nth-child(3) {
+        animation-delay: 0.45s;
+        --accent: var(--accent-3);
+      }
+      .card:nth-child(4) {
+        animation-delay: 0.6s;
+        --accent: var(--accent-4);
       }
       /* Nowe karty: dodaj nth-child(3) z własnym --accent */
 
@@ -248,6 +264,16 @@
         <span class="arrow">Zaczynamy →</span>
       </a>
 
+      <a class="card" href="dzielenie.html">
+        <span class="card-icon">➗</span>
+        <h2>Dzielenie</h2>
+        <p>
+          Dziel liczby całkowite bez reszty. Ustaw maksymalny dzielnik i dzielną
+          według poziomu trudności.
+        </p>
+        <span class="arrow">Zaczynamy →</span>
+      </a>
+
       <a class="card" href="potegowanie.html">
         <span class="card-icon">⚡</span>
         <h2>Potęgowanie</h2>
@@ -257,14 +283,18 @@
         <span class="arrow">Zaczynamy →</span>
       </a>
 
-      <!-- Tutaj wklejaj kolejne karty, np.:
-    <a class="card" href="pierwiastki.html">
-      <span class="card-icon">√</span>
-      <h2>Pierwiastki</h2>
-      <p>Opis nowego quizu.</p>
-      <span class="arrow">Zaczynamy →</span>
-    </a>
-    --></div>
+      <!-- Tutaj wklejaj kolejne karty, np.: !-->
+
+      <a class="card" href="pierwiastkowanie.html">
+        <span class="card-icon">√</span>
+        <h2>Pierwiastkowanie</h2>
+        <p>
+          Obliczaj pierwiastki stopnia 2–10 z liczb całkowitych. Ustawienia
+          dostosujesz w trakcie quizu.
+        </p>
+        <span class="arrow">Zaczynamy →</span>
+      </a>
+    </div>
 
     <footer>Powodzenia! 🎯</footer>
   </body>
