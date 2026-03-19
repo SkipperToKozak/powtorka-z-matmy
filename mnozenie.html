@@ -85,7 +85,7 @@
         grid-template-columns: 1fr;
       }
       .stats-panel {
-        order: 1;   /* statystyki nad pytaniem na mobile */
+        order: -1;   /* statystyki nad pytaniem na mobile */
       }
     }
 
@@ -385,19 +385,27 @@
 
     // generuje 4 unikalne opcje odpowiedzi (jedna poprawna)
     function generateOptions(correct) {
-      const opts = new Set([correct]);
-      const range = (CONFIG.maxFactor - CONFIG.minFactor + 1);
-      const maxPossible = CONFIG.maxFactor * CONFIG.maxFactor;
+      // Budujemy 6 fałszywek: 3 poniżej i 3 powyżej poprawnej odpowiedzi
+      const step = 1;
+      const distractors = [
+        correct - 3 * step,
+        correct - 2 * step,
+        correct - 1 * step,
+        correct + 1 * step,
+        correct + 2 * step,
+        correct + 3 * step,
+      ].filter(v => v > 0); // odrzucamy wartości niedodatnie
 
-      while (opts.size < CONFIG.optionsCount) {
-        // losuj "bliskie" wyniki, żeby pytanie było trudniejsze
-        const offset = randInt(-12, 12);
-        const candidate = Math.max(1, correct + offset);
-        if (candidate !== correct && candidate <= maxPossible) {
-          opts.add(candidate);
-        }
-      }
-      return shuffle([...opts]);
+      // Losujemy index startowy i wycinamy 3 sąsiadujące fałszywki
+      const maxStart = Math.max(0, distractors.length - 3);
+      const start    = randInt(0, maxStart);
+      const picked   = distractors.slice(start, start + 3);
+
+      // Uzupełnij do 3 jeśli filter odrzucił za dużo (małe wartości correct)
+      let fallback = correct + 4 * step;
+      while (picked.length < 3) { picked.push(fallback); fallback += step; }
+
+      return shuffle([...picked, correct]);
     }
 
     /* ==========================================================

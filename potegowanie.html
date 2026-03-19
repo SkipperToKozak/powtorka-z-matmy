@@ -1,654 +1,553 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Potęgowanie – Quiz</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      /* =====================================================
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Potęgowanie – Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* =====================================================
        QUIZ – POTĘGOWANIE
        Kolory i ustawienia: edytuj zmienne w :root
        ===================================================== */
-      :root {
-        --bg: #0d1b2a;
-        --surface: #132337;
-        --surface-2: #1a2e45;
-        --accent: #e05c5c; /* główny kolor akcentu (czerwony) */
-        --accent-dim: rgba(224, 92, 92, 0.12);
-        --correct: #4caf78;
-        --wrong: #e05c5c;
-        --text: #e8f0f7;
-        --text-muted: #7a9ab5;
-        --radius: 14px;
-        --radius-lg: 22px;
-      }
+    :root {
+      --bg:          #0d1b2a;
+      --surface:     #132337;
+      --surface-2:   #1a2e45;
+      --accent:      #e05c5c;      /* główny kolor akcentu (czerwony) */
+      --accent-dim:  rgba(224,92,92,0.12);
+      --correct:     #4caf78;
+      --wrong:       #e05c5c;
+      --text:        #e8f0f7;
+      --text-muted:  #7a9ab5;
+      --radius:      14px;
+      --radius-lg:   22px;
+    }
 
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-      body {
-        background: var(--bg);
-        color: var(--text);
-        font-family: "Nunito", sans-serif;
-        min-height: 100vh;
-        padding: 1.5rem;
-      }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
 
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background: radial-gradient(
-          circle at 90% 10%,
-          rgba(224, 92, 92, 0.07) 0%,
-          transparent 50%
-        );
-        pointer-events: none;
-      }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(circle at 90% 10%, rgba(224,92,92,0.07) 0%, transparent 50%);
+      pointer-events: none;
+    }
 
-      /* ---- NAWIGACJA ---- */
-      nav {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 2rem;
-      }
-      nav a {
-        color: var(--text-muted);
-        text-decoration: none;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        transition: color 0.2s;
-      }
-      nav a:hover {
-        color: var(--accent);
-      }
-      nav .sep {
-        color: var(--text-muted);
-      }
-      nav .current {
-        color: var(--accent);
-        font-weight: 700;
-        font-size: 0.9rem;
-      }
+    /* ---- NAWIGACJA ---- */
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--accent); }
+    nav .sep { color: var(--text-muted); }
+    nav .current { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
 
-      /* ---- LAYOUT ---- */
-      .layout {
-        display: grid;
-        grid-template-columns: 1fr 280px;
-        gap: 1.5rem;
-        max-width: 900px;
-        margin: 0 auto;
-        align-items: start;
-      }
+    /* ---- LAYOUT ---- */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      align-items: start;
+    }
 
-      @media (max-width: 680px) {
-        .layout {
-          grid-template-columns: 1fr;
-        }
-        .stats-panel {
-          order: 1;
-        }
-      }
+    @media (max-width: 680px) {
+      .layout { grid-template-columns: 1fr; }
+      .stats-panel { order: -1; }
+    }
 
-      /* ---- PANEL PYTANIA ---- */
-      .quiz-panel {
-        background: var(--surface);
-        border-radius: var(--radius-lg);
-        padding: 2.5rem;
-        animation: fadeIn 0.5s ease;
-      }
+    /* ---- PANEL PYTANIA ---- */
+    .quiz-panel {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      animation: fadeIn 0.5s ease;
+    }
 
-      .question-label {
-        font-size: 0.8rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--accent);
-        margin-bottom: 1.2rem;
-      }
+    .question-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
 
-      /* pytanie z potęgą wyświetloną jako superskrypt */
-      .question {
-        font-family: "Baloo 2", cursive;
-        font-size: clamp(2.4rem, 7vw, 4rem);
-        font-weight: 800;
-        text-align: center;
-        padding: 1.5rem 0 2rem;
-        letter-spacing: -1px;
-        line-height: 1;
-      }
+    /* pytanie z potęgą wyświetloną jako superskrypt */
+    .question {
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(2.4rem, 7vw, 4rem);
+      font-weight: 800;
+      text-align: center;
+      padding: 1.5rem 0 2rem;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
 
-      .question sup {
-        font-size: 0.55em;
-        vertical-align: super;
-        color: var(--accent);
-      }
+    .question sup {
+      font-size: 0.55em;
+      vertical-align: super;
+      color: var(--accent);
+    }
 
-      /* ---- OPCJE ---- */
-      .options {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.85rem;
-      }
+    /* ---- OPCJE ---- */
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
 
-      .option-btn {
-        background: var(--surface-2);
-        border: 2px solid transparent;
-        border-radius: var(--radius);
-        color: var(--text);
-        cursor: pointer;
-        font-family: "Baloo 2", cursive;
-        font-size: 1.5rem;
-        font-weight: 800;
-        padding: 1rem;
-        transition:
-          background 0.18s,
-          border-color 0.18s,
-          transform 0.15s;
-      }
+    .option-btn {
+      background: var(--surface-2);
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      color: var(--text);
+      cursor: pointer;
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.5rem;
+      font-weight: 800;
+      padding: 1rem;
+      transition: background 0.18s, border-color 0.18s, transform 0.15s;
+    }
 
-      .option-btn:hover:not(:disabled) {
-        background: var(--accent-dim);
-        border-color: var(--accent);
-        transform: scale(1.03);
-      }
+    .option-btn:hover:not(:disabled) {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      transform: scale(1.03);
+    }
 
-      .option-btn.correct {
-        background: rgba(76, 175, 120, 0.15);
-        border-color: var(--correct);
-        color: var(--correct);
-      }
+    .option-btn.correct {
+      background: rgba(76,175,120,0.15);
+      border-color: var(--correct);
+      color: var(--correct);
+    }
 
-      .option-btn.wrong {
-        background: rgba(224, 92, 92, 0.15);
-        border-color: var(--wrong);
-        color: var(--wrong);
-      }
+    .option-btn.wrong {
+      background: rgba(224,92,92,0.15);
+      border-color: var(--wrong);
+      color: var(--wrong);
+    }
 
-      .option-btn:disabled {
-        cursor: default;
-      }
+    .option-btn:disabled { cursor: default; }
 
-      /* ---- FEEDBACK ---- */
-      .feedback {
-        text-align: center;
-        min-height: 2.5rem;
-        margin-top: 1.5rem;
-        font-size: 1.05rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-      .feedback.show {
-        opacity: 1;
-      }
-      .feedback.ok {
-        color: var(--correct);
-      }
-      .feedback.err {
-        color: var(--wrong);
-      }
+    /* ---- FEEDBACK ---- */
+    .feedback {
+      text-align: center;
+      min-height: 2.5rem;
+      margin-top: 1.5rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feedback.show { opacity: 1; }
+    .feedback.ok   { color: var(--correct); }
+    .feedback.err  { color: var(--wrong); }
 
-      /* ---- STATYSTYKI ---- */
-      .stats-panel {
-        background: var(--surface);
-        border-radius: var(--radius-lg);
-        padding: 1.8rem;
-        animation: fadeIn 0.5s 0.15s ease both;
-      }
+    /* ---- STATYSTYKI ---- */
+    .stats-panel {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      animation: fadeIn 0.5s 0.15s ease both;
+    }
 
-      .stats-title {
-        font-family: "Baloo 2", cursive;
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: var(--accent);
-        margin-bottom: 1.4rem;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-      }
+    .stats-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
 
-      .stat-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.65rem 0;
-        border-bottom: 1px solid var(--surface-2);
-        font-size: 0.95rem;
-      }
-      .stat-row:last-of-type {
-        border-bottom: none;
-      }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--surface-2);
+      font-size: 0.95rem;
+    }
+    .stat-row:last-of-type { border-bottom: none; }
 
-      .stat-label {
-        color: var(--text-muted);
-      }
-      .stat-value {
-        font-family: "Baloo 2", cursive;
-        font-size: 1.3rem;
-        font-weight: 800;
-      }
-      .stat-value.accent {
-        color: var(--accent);
-      }
-      .stat-value.green {
-        color: var(--correct);
-      }
-      .stat-value.red {
-        color: var(--wrong);
-      }
+    .stat-label { color: var(--text-muted); }
+    .stat-value {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+    .stat-value.accent { color: var(--accent); }
+    .stat-value.green  { color: var(--correct); }
+    .stat-value.red    { color: var(--wrong); }
 
-      /* ostatnio zadana potęga */
-      .last-question {
-        background: var(--surface-2);
-        border-radius: var(--radius);
-        padding: 0.7rem 1rem;
-        margin-top: 1rem;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        min-height: 2.4rem;
-      }
+    /* ostatnio zadana potęga */
+    .last-question {
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      padding: 0.7rem 1rem;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      min-height: 2.4rem;
+    }
 
-      .last-question span {
-        color: var(--text);
-        font-weight: 700;
-      }
+    .last-question span { color: var(--text); font-weight: 700; }
 
-      .progress-bar {
-        height: 8px;
-        background: var(--surface-2);
-        border-radius: 99px;
-        overflow: hidden;
-        margin-top: 1.4rem;
-      }
+    .progress-bar {
+      height: 8px;
+      background: var(--surface-2);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 1.4rem;
+    }
 
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--accent), #ff9d9d);
-        border-radius: 99px;
-        transition: width 0.4s ease;
-        width: 0%;
-      }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #ff9d9d);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
 
-      .progress-label {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.78rem;
-        color: var(--text-muted);
-        margin-top: 0.4rem;
-      }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
 
-      .reset-btn {
-        display: block;
-        width: 100%;
-        margin-top: 1.5rem;
-        background: none;
-        border: 2px solid var(--surface-2);
-        border-radius: var(--radius);
-        color: var(--text-muted);
-        cursor: pointer;
-        font-family: "Nunito", sans-serif;
-        font-size: 0.85rem;
-        font-weight: 700;
-        padding: 0.6rem;
-        transition:
-          border-color 0.2s,
-          color 0.2s;
-      }
-      .reset-btn:hover {
-        border-color: var(--wrong);
-        color: var(--wrong);
-      }
+    .reset-btn {
+      display: block;
+      width: 100%;
+      margin-top: 1.5rem;
+      background: none;
+      border: 2px solid var(--surface-2);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.6rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .reset-btn:hover { border-color: var(--wrong); color: var(--wrong); }
 
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(16px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-      @keyframes pop {
-        0% {
-          transform: scale(1);
-        }
-        40% {
-          transform: scale(1.06);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
+    @keyframes pop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
 
-      .pop {
-        animation: pop 0.25s ease;
-      }
-    </style>
-  </head>
-  <body>
-    <nav>
-      <a href="index.html">🏠 Strona główna</a>
-      <span class="sep">/</span>
-      <span class="current">⚡ Potęgowanie</span>
-    </nav>
+    .pop { animation: pop 0.25s ease; }
+  </style>
+</head>
+<body>
 
-    <div class="layout">
-      <div class="quiz-panel">
-        <div class="question-label">📌 Pytanie</div>
-        <div class="question" id="question">?</div>
-        <div class="options" id="options"></div>
-        <div class="feedback" id="feedback"></div>
-      </div>
+  <nav>
+    <a href="index.html">🏠 Strona główna</a>
+    <span class="sep">/</span>
+    <span class="current">⚡ Potęgowanie</span>
+  </nav>
 
-      <div class="stats-panel">
-        <div class="stats-title">📊 Statystyki</div>
+  <div class="layout">
 
-        <div class="stat-row">
-          <span class="stat-label">Pytania</span>
-          <span class="stat-value accent" id="stat-total">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Poprawne</span>
-          <span class="stat-value green" id="stat-correct">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Błędne</span>
-          <span class="stat-value red" id="stat-wrong">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Seria</span>
-          <span class="stat-value accent" id="stat-streak">0 🔥</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Najlepsza seria</span>
-          <span class="stat-value" id="stat-best-streak">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Dokładność</span>
-          <span class="stat-value" id="stat-accuracy">–</span>
-        </div>
-
-        <div class="last-question" id="last-q">
-          Ostatnie pytanie pojawi się tutaj.
-        </div>
-
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
-        <div class="progress-label">
-          <span>Dokładność</span>
-          <span id="progress-pct">0%</span>
-        </div>
-
-        <button class="reset-btn" id="reset-btn">🔄 Resetuj statystyki</button>
-      </div>
+    <div class="quiz-panel">
+      <div class="question-label">📌 Pytanie</div>
+      <div class="question" id="question">?</div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
     </div>
 
-    <script>
-      /* ==========================================================
+    <div class="stats-panel">
+      <div class="stats-title">📊 Statystyki</div>
+
+      <div class="stat-row">
+        <span class="stat-label">Pytania</span>
+        <span class="stat-value accent" id="stat-total">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Poprawne</span>
+        <span class="stat-value green" id="stat-correct">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Błędne</span>
+        <span class="stat-value red" id="stat-wrong">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Seria</span>
+        <span class="stat-value accent" id="stat-streak">0 🔥</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Najlepsza seria</span>
+        <span class="stat-value" id="stat-best-streak">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Dokładność</span>
+        <span class="stat-value" id="stat-accuracy">–</span>
+      </div>
+
+      <div class="last-question" id="last-q">Ostatnie pytanie pojawi się tutaj.</div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-label">
+        <span>Dokładność</span>
+        <span id="progress-pct">0%</span>
+      </div>
+
+      <button class="reset-btn" id="reset-btn">🔄 Resetuj statystyki</button>
+    </div>
+
+  </div>
+
+  <script>
+    /* ==========================================================
        KONFIGURACJA – zmień te wartości, żeby dostosować quiz
        ========================================================== */
-      const CONFIG = {
-        minBase: 1, // minimalna podstawa potęgi
-        maxBase: 20, // maksymalna podstawa potęgi
-        maxResult: 1024, // maksymalny dopuszczalny wynik potęgowania
-        optionCount: 4, // liczba opcji do wyboru
-        nextDelay: 900, // ms przed przejściem do kolejnego pytania
-      };
+    const CONFIG = {
+      minBase:    1,     // minimalna podstawa potęgi
+      maxBase:    20,    // maksymalna podstawa potęgi
+      maxResult:  1024,  // maksymalny dopuszczalny wynik potęgowania
+      optionCount: 4,    // liczba opcji do wyboru
+      nextDelay:  900,   // ms przed przejściem do kolejnego pytania
+    };
 
-      /* ==========================================================
+    /* ==========================================================
        GENERATOR MOŻLIWYCH PYTAŃ
        Budujemy listę wszystkich par (base, exp) gdzie base^exp <= maxResult
        ========================================================== */
-      function buildPowerTable(minBase, maxBase, maxResult) {
-        const table = [];
-        for (let base = minBase; base <= maxBase; base++) {
-          if (base === 1) {
-            // 1^n = 1 zawsze, sensowne tylko dla exp = 1..5 żeby było różnorodnie
-            for (let exp = 2; exp <= 10; exp++) {
-              table.push({ base, exp, result: 1 });
-            }
-            continue;
+    function buildPowerTable(minBase, maxBase, maxResult) {
+      const table = [];
+      for (let base = minBase; base <= maxBase; base++) {
+        if (base === 1) {
+          // 1^n = 1 zawsze, sensowne tylko dla exp = 1..5 żeby było różnorodnie
+          for (let exp = 2; exp <= 10; exp++) {
+            table.push({ base, exp, result: 1 });
           }
-          let result = base;
-          let exp = 1;
-          while (result <= maxResult) {
-            if (exp >= 2) {
-              // pomijamy potęgę 1 (base^1 = base – zbyt proste)
-              table.push({ base, exp, result });
-            }
-            exp++;
-            result = Math.pow(base, exp);
-          }
+          continue;
         }
-        return table;
+        let result = base;
+        let exp = 1;
+        while (result <= maxResult) {
+          if (exp >= 2) {   // pomijamy potęgę 1 (base^1 = base – zbyt proste)
+            table.push({ base, exp, result });
+          }
+          exp++;
+          result = Math.pow(base, exp);
+        }
       }
+      return table;
+    }
 
-      const POWER_TABLE = buildPowerTable(
-        CONFIG.minBase,
-        CONFIG.maxBase,
-        CONFIG.maxResult,
-      );
+    const POWER_TABLE = buildPowerTable(CONFIG.minBase, CONFIG.maxBase, CONFIG.maxResult);
 
-      /* ==========================================================
+    /* ==========================================================
        STAN GRY
        ========================================================== */
-      let state = {
-        total: 0,
-        correct: 0,
-        wrong: 0,
-        streak: 0,
-        bestStreak: 0,
-        currentAnswer: null,
-        locked: false,
-        lastQuestion: "",
-      };
+    let state = {
+      total: 0, correct: 0, wrong: 0,
+      streak: 0, bestStreak: 0,
+      currentAnswer: null, locked: false,
+      lastQuestion: '',
+    };
 
-      /* ==========================================================
+    /* ==========================================================
        POMOCNICZE
        ========================================================== */
-      function randInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-      }
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-      function shuffle(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-          const j = randInt(0, i);
-          [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = randInt(0, i);
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
+      return arr;
+    }
 
-      /* Generuje rozproszenia odpowiedzi bliskie prawdziwemu wynikowi,
+    /* Generuje rozproszenia odpowiedzi bliskie prawdziwemu wynikowi,
        bazując na innych wpisach z POWER_TABLE */
-      function generateOptions(correct) {
-        // zbierz wyniki z POWER_TABLE, które są "bliskie" correctowi
-        const candidates = POWER_TABLE.map((p) => p.result).filter(
-          (r) => r !== correct,
-        );
+    function generateOptions(correct) {
+      // Budujemy posortowaną listę unikalnych wyników z POWER_TABLE (bez poprawnego)
+      const sorted = [...new Set(POWER_TABLE.map(p => p.result))]
+        .filter(r => r !== correct)
+        .sort((a, b) => a - b);
 
-        // posortuj po odległości od correct
-        candidates.sort(
-          (a, b) => Math.abs(a - correct) - Math.abs(b - correct),
-        );
+      // Szukamy pozycji wstawienia poprawnego wyniku w posortowanej liście
+      const insertPos = sorted.findIndex(r => r > correct);
+      const pos = insertPos === -1 ? sorted.length : insertPos;
 
-        // weź kilka najbliższych, a resztę losuj
-        const nearPool = [...new Set(candidates.slice(0, 20))];
-        const picked = new Set([correct]);
+      // Bierzemy po 3 sąsiadów z każdej strony
+      const neighbours = [
+        ...sorted.slice(Math.max(0, pos - 3), pos),
+        ...sorted.slice(pos, pos + 3),
+      ];
 
-        // najpierw spróbuj "bliskie"
-        for (const v of nearPool) {
-          if (picked.size >= CONFIG.optionCount) break;
-          picked.add(v);
-        }
+      // Losujemy index startowy i wycinamy 3 sąsiadujące fałszywki
+      const maxStart = Math.max(0, neighbours.length - 3);
+      const start    = randInt(0, maxStart);
+      const picked   = neighbours.slice(start, start + 3);
 
-        // uzupełnij losowymi, jeśli potrzeba
-        while (picked.size < CONFIG.optionCount) {
-          const idx = randInt(0, POWER_TABLE.length - 1);
-          picked.add(POWER_TABLE[idx].result);
-        }
+      let fallback = correct + 1;
+      while (picked.length < 3) { picked.push(fallback++); }
 
-        return shuffle([...picked]);
-      }
+      return shuffle([...picked, correct]);
+    }
 
-      /* ==========================================================
+    /* ==========================================================
        NOWE PYTANIE
        ========================================================== */
-      function newQuestion() {
-        state.locked = false;
+    function newQuestion() {
+      state.locked = false;
 
-        const item = POWER_TABLE[randInt(0, POWER_TABLE.length - 1)];
-        state.currentAnswer = item.result;
-        state.lastQuestion = `${item.base}^${item.exp} = ${item.result}`;
+      const item = POWER_TABLE[randInt(0, POWER_TABLE.length - 1)];
+      state.currentAnswer = item.result;
+      state.lastQuestion = `${item.base}^${item.exp} = ${item.result}`;
 
-        // Wyświetl pytanie z superskryptem dla wykładnika
-        const qEl = document.getElementById("question");
-        qEl.innerHTML = `${item.base}<sup>${item.exp}</sup> = ?`;
-        qEl.classList.remove("pop");
-        void qEl.offsetWidth;
-        qEl.classList.add("pop");
+      // Wyświetl pytanie z superskryptem dla wykładnika
+      const qEl = document.getElementById('question');
+      qEl.innerHTML = `${item.base}<sup>${item.exp}</sup> = ?`;
+      qEl.classList.remove('pop');
+      void qEl.offsetWidth;
+      qEl.classList.add('pop');
 
-        // Opcje
-        const opts = generateOptions(item.result);
-        const container = document.getElementById("options");
-        container.innerHTML = "";
+      // Opcje
+      const opts = generateOptions(item.result);
+      const container = document.getElementById('options');
+      container.innerHTML = '';
 
-        opts.forEach((val) => {
-          const btn = document.createElement("button");
-          btn.className = "option-btn";
-          btn.textContent = val;
-          btn.addEventListener("click", () => handleAnswer(btn, val));
-          container.appendChild(btn);
-        });
-
-        // Czyść feedback
-        const fb = document.getElementById("feedback");
-        fb.className = "feedback";
-        fb.textContent = "";
-      }
-
-      /* ==========================================================
-       OBSŁUGA ODPOWIEDZI
-       ========================================================== */
-      function handleAnswer(btn, selected) {
-        if (state.locked) return;
-        state.locked = true;
-
-        const isCorrect = selected === state.currentAnswer;
-        state.total++;
-
-        if (isCorrect) {
-          state.correct++;
-          state.streak++;
-          if (state.streak > state.bestStreak) state.bestStreak = state.streak;
-          btn.classList.add("correct");
-          showFeedback("ok", "✅ Brawo! Poprawna odpowiedź!");
-        } else {
-          state.wrong++;
-          state.streak = 0;
-          btn.classList.add("wrong");
-          showFeedback(
-            "err",
-            `❌ Błąd! Poprawna odpowiedź: ${state.currentAnswer}`,
-          );
-          document.querySelectorAll(".option-btn").forEach((b) => {
-            if (parseInt(b.textContent) === state.currentAnswer)
-              b.classList.add("correct");
-          });
-        }
-
-        document
-          .querySelectorAll(".option-btn")
-          .forEach((b) => (b.disabled = true));
-
-        // zapisz ostatnie pytanie do statystyk
-        document.getElementById("last-q").innerHTML =
-          `Ostatnie: <span>${state.lastQuestion}</span>`;
-
-        updateStats();
-        setTimeout(newQuestion, CONFIG.nextDelay);
-      }
-
-      /* ==========================================================
-       FEEDBACK
-       ========================================================== */
-      function showFeedback(type, msg) {
-        const fb = document.getElementById("feedback");
-        fb.className = `feedback show ${type}`;
-        fb.textContent = msg;
-      }
-
-      /* ==========================================================
-       AKTUALIZACJA STATYSTYK
-       ========================================================== */
-      function updateStats() {
-        document.getElementById("stat-total").textContent = state.total;
-        document.getElementById("stat-correct").textContent = state.correct;
-        document.getElementById("stat-wrong").textContent = state.wrong;
-        document.getElementById("stat-streak").textContent =
-          `${state.streak} 🔥`;
-        document.getElementById("stat-best-streak").textContent =
-          state.bestStreak;
-
-        const accuracy =
-          state.total > 0 ? Math.round((state.correct / state.total) * 100) : 0;
-
-        const accEl = document.getElementById("stat-accuracy");
-        accEl.textContent = state.total > 0 ? `${accuracy}%` : "–";
-        accEl.style.color =
-          accuracy >= 80
-            ? "var(--correct)"
-            : accuracy >= 50
-              ? "#f7c948"
-              : "var(--wrong)";
-
-        document.getElementById("progress-fill").style.width = `${accuracy}%`;
-        document.getElementById("progress-pct").textContent = `${accuracy}%`;
-      }
-
-      /* ==========================================================
-       RESET
-       ========================================================== */
-      document.getElementById("reset-btn").addEventListener("click", () => {
-        state = {
-          total: 0,
-          correct: 0,
-          wrong: 0,
-          streak: 0,
-          bestStreak: 0,
-          currentAnswer: null,
-          locked: false,
-          lastQuestion: "",
-        };
-        document.getElementById("last-q").textContent =
-          "Ostatnie pytanie pojawi się tutaj.";
-        updateStats();
-        newQuestion();
+      opts.forEach(val => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = val;
+        btn.addEventListener('click', () => handleAnswer(btn, val));
+        container.appendChild(btn);
       });
 
-      /* ==========================================================
+      // Czyść feedback
+      const fb = document.getElementById('feedback');
+      fb.className = 'feedback';
+      fb.textContent = '';
+    }
+
+    /* ==========================================================
+       OBSŁUGA ODPOWIEDZI
+       ========================================================== */
+    function handleAnswer(btn, selected) {
+      if (state.locked) return;
+      state.locked = true;
+
+      const isCorrect = selected === state.currentAnswer;
+      state.total++;
+
+      if (isCorrect) {
+        state.correct++;
+        state.streak++;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+        btn.classList.add('correct');
+        showFeedback('ok', '✅ Brawo! Poprawna odpowiedź!');
+      } else {
+        state.wrong++;
+        state.streak = 0;
+        btn.classList.add('wrong');
+        showFeedback('err', `❌ Błąd! Poprawna odpowiedź: ${state.currentAnswer}`);
+        document.querySelectorAll('.option-btn').forEach(b => {
+          if (parseInt(b.textContent) === state.currentAnswer) b.classList.add('correct');
+        });
+      }
+
+      document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+      // zapisz ostatnie pytanie do statystyk
+      document.getElementById('last-q').innerHTML =
+        `Ostatnie: <span>${state.lastQuestion}</span>`;
+
+      updateStats();
+      setTimeout(newQuestion, CONFIG.nextDelay);
+    }
+
+    /* ==========================================================
+       FEEDBACK
+       ========================================================== */
+    function showFeedback(type, msg) {
+      const fb = document.getElementById('feedback');
+      fb.className = `feedback show ${type}`;
+      fb.textContent = msg;
+    }
+
+    /* ==========================================================
+       AKTUALIZACJA STATYSTYK
+       ========================================================== */
+    function updateStats() {
+      document.getElementById('stat-total').textContent   = state.total;
+      document.getElementById('stat-correct').textContent = state.correct;
+      document.getElementById('stat-wrong').textContent   = state.wrong;
+      document.getElementById('stat-streak').textContent  = `${state.streak} 🔥`;
+      document.getElementById('stat-best-streak').textContent = state.bestStreak;
+
+      const accuracy = state.total > 0
+        ? Math.round((state.correct / state.total) * 100) : 0;
+
+      const accEl = document.getElementById('stat-accuracy');
+      accEl.textContent = state.total > 0 ? `${accuracy}%` : '–';
+      accEl.style.color = accuracy >= 80 ? 'var(--correct)' : accuracy >= 50 ? '#f7c948' : 'var(--wrong)';
+
+      document.getElementById('progress-fill').style.width = `${accuracy}%`;
+      document.getElementById('progress-pct').textContent  = `${accuracy}%`;
+    }
+
+    /* ==========================================================
+       RESET
+       ========================================================== */
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      state = { total:0, correct:0, wrong:0, streak:0, bestStreak:0,
+                currentAnswer:null, locked:false, lastQuestion:'' };
+      document.getElementById('last-q').textContent = 'Ostatnie pytanie pojawi się tutaj.';
+      updateStats();
+      newQuestion();
+    });
+
+    /* ==========================================================
        START
        ========================================================== */
-      newQuestion();
-    </script>
-  </body>
+    newQuestion();
+  </script>
+
+</body>
 </html>
