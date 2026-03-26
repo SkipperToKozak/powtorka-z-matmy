@@ -21,6 +21,9 @@
         --accent-2: #e05c5c; /* czerwony – potęgowanie */
         --accent-3: #4fc4a0; /* turkusowy – pierwiastkowanie */
         --accent-4: #a78bfa; /* fioletowy – dzielenie */
+        --accent-5:   #38bdf8;   /* błękitny  – dodawanie  */
+        --accent-6:   #fb923c;   /* pomarańczowy – odejmowanie */
+
         /* Tutaj możesz dodać kolejne akcenty dla nowych zakładek */
         --text: #e8f0f7;
         --text-muted: #7a9ab5;
@@ -147,6 +150,14 @@
       .card:nth-child(4) {
         animation-delay: 0.6s;
         --accent: var(--accent-4);
+      }
+      .card:nth-child(5) { 
+        animation-delay: 0.75s;
+        --accent: var(--accent-5); 
+      }
+      .card:nth-child(6) {
+        animation-delay: 0.90s;
+        --accent: var(--accent-6); 
       }
       /* Nowe karty: dodaj nth-child(3) z własnym --accent */
 
@@ -294,7 +305,23 @@
         </p>
         <span class="arrow">Zaczynamy →</span>
       </a>
+      <a class="card" href="dodawanie.html">
+        <span class="card-icon">➕</span>
+        <h2>Dodawanie</h2>
+        <p>Dodawaj liczby całkowite. Ustaw zakres i liczbę składników – od 2 do 5 naraz.</p>
+        <span class="arrow">Zaczynamy →</span>
+      </a>
+ 
+      <a class="card" href="odejmowanie.html">
+        <span class="card-icon">➖</span>
+        <h2>Odejmowanie</h2>
+        <p>Odejmuj liczby całkowite. Opcjonalnie włącz wyniki ujemne dla większego wyzwania.</p>
+        <span class="arrow">Zaczynamy →</span>
+      </a>
     </div>
+    
+
+ 
 
     <footer>Powodzenia! 🎯</footer>
   </body>
